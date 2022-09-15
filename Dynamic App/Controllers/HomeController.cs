@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using System.Data;
 using System.Data.SqlClient;
 using Dynamic_App.Models;
+using System.Web.Script.Serialization;
 
 namespace Dynamic_App.Controllers
 {
@@ -13,7 +14,8 @@ namespace Dynamic_App.Controllers
     {
 
         // DBConn
-        string conStr = "Data Source=ICS-26; User ID=sa; password=welt12#; Initial Catalog=Student";
+        string conStr = "Data Source=.; Initial Catalog=Student;Integrated Security=True;";
+        // Data Source=.;Initial Catalog=Student;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False
         SqlConnection conn = new SqlConnection();
         SqlCommand cmd = new SqlCommand();
 
@@ -32,11 +34,16 @@ namespace Dynamic_App.Controllers
             return View();
         }
 
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
 
-            return View();
+
+        public ActionResult EditEmp(int id)
+        {
+            Employee e2 = new Employee();
+            List<Department> listDepts = this.getsDept();
+            ViewBag.listDepts = listDepts;
+            List<Employee> eList = this.getEmpByID(id);
+            e2 = eList.FirstOrDefault();
+            return View(e2);
         }
 
 
@@ -65,6 +72,45 @@ namespace Dynamic_App.Controllers
             return b;
         }
 
+
+        [HttpPost]
+        public JsonResult Save(Employee e)
+        {
+            Employee employee = new Employee();
+            if (this.SaveEmployee(e))
+            {
+                employee.ErrorMessage = "";
+            }
+            else
+            {
+                employee.ErrorMessage = "Data Not Saved";
+            }
+
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            string sjson = serializer.Serialize(employee);
+            return Json(sjson, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult Update(Employee e)
+        {
+            Employee e2 = new Employee();
+            if (!this.UpdateEmployee(e))
+            {
+                e2.ErrorMessage = "Update Faild!";
+            }
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            string sjson = serializer.Serialize(e2);
+            return Json(sjson, JsonRequestBehavior.AllowGet);
+        }
+
+
+        public ActionResult Delete(int id)
+        {
+            if (this.DeleteEmployee(id))
+                return RedirectToAction("Indexs");
+            return RedirectToAction("Indexs");
+        }
 
         public bool UpdateEmployee(Employee emp)
         {
@@ -112,7 +158,11 @@ namespace Dynamic_App.Controllers
 
         public DataSet getEmployees()
         {
-            string sSql = "Select HH.* , (Select DepartmentName From Department Where DepartmentID = HH.DepartmentID) AS DepartmentName from Employee AS HH ";
+            string sSql = @"Select " +
+                "HH.* , " +
+                "(Select DepartmentName From Department Where DepartmentID = HH.DepartmentID) AS DepartmentName, " +
+                " CASE WHEN HH.EmployeeGender = 1 THEN 'Male' ELSE 'Female' END as GenderName " +
+              " from Employee AS HH ";
             conn = new SqlConnection(conStr);
             cmd = new SqlCommand(sSql, conn);
             cmd.CommandType = CommandType.Text;
@@ -144,7 +194,7 @@ namespace Dynamic_App.Controllers
                     emp.DepartmentID = Convert.ToInt32(dr["EmployeeID"]);
                     emp.DepartmentName = dr["DepartmentName"].ToString();
                     emp.EmployeeEmail = dr["EmployeeEmail"].ToString();
-                    emp.EmployeeGender = Convert.ToInt32(dr["EmployeeID"]);
+                    emp.EmployeeGender = Convert.ToInt32(dr["EmployeeGender"]);
                     employees.Add(emp);
                 }
             }

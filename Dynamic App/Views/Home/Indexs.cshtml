@@ -1,17 +1,48 @@
 ﻿@{
-    ViewBag.Title = "Contact";
+    ViewBag.Title = "Employee List";
 }
 <h2>@ViewBag.Title.</h2>
 <h3>@ViewBag.Message</h3>
 
-<address>
-    One Microsoft Way<br />
-    Redmond, WA 98052-6399<br />
-    <abbr title="Phone">P:</abbr>
-    425.555.0100
-</address>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <a href="/Home/indexs">Employee List</a>
+            <br />
+            <a href="/Home/index">Home</a>
+            <br />
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Employee name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Gender</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                @{
+                    foreach (System.Data.DataRow dr in ViewBag.empList.Rows)
+                    {
+                        <tbody>
+                            <tr>
+                                <td>@dr["EmployeeName"]</td>
+                                <td>@dr["EmployeeEmail"]</td>
+                                <td>@dr["DepartmentName"]</td>
+                                <td>@dr["GenderName"]</td>
+                                <td><a href="/Home/EditEmp?id=@dr["EmployeeID"]">Edit</a></td>
+                                <td><a href="/Home/Delete?id=@dr["EmployeeID"]" onclick="return confirm('are you sure ?')">Delete</a></td>
+                            </tr>
+                        </tbody>
+                    }
 
-<address>
-    <strong>Support:</strong>   <a href="mailto:Support@example.com">Support@example.com</a><br />
-    <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
-</address>
+                }
+            </table>
+        </div>
+        <div class="col-md-3">
+            
+        </div>
+    </div>
+</div>

@@ -3,7 +3,7 @@
 }
 
 
-
+@model Dynamic_App.Models.Employee
 
 <div class="row">
     <div class="col-md-2"></div>
@@ -12,7 +12,9 @@
             <h2 style="text-align:center">Employee Information</h2>
             <hr />
         </div>
+        <a href="/Home/indexs">Employee List</a>
         <br />
+        <a href="/Home/index">Home</a>
         <br />
         <div class="col-sm-12">
             <div class="col-sm-4">
@@ -29,7 +31,7 @@
                 Email :
             </div>
             <div class="col-sm-8">
-                <input type="text" id="txtEmployeeEmail" placeholder="Enter Email" style="width:100%" class="form-control"/>
+                <input type="text" id="txtEmployeeEmail" placeholder="Enter Email" style="width:100%" class="form-control" />
             </div>
         </div>
         <br />
@@ -52,9 +54,9 @@
             </div>
             <div class="col-sm-8">
                 Male :
-                <input type="radio" name="EmployeeGender" id="1" />
+                <input type="radio" name="EmployeeGender" id="1" value="1" />
                 Female :
-                <input type="radio" name="EmployeeGender" id="2" />
+                <input type="radio" name="EmployeeGender" id="2" value="2" />
             </div>
         </div>
         <br />
@@ -82,12 +84,52 @@
         LoadCombo(listDepts);
     });
 
-
+    var _BaseAddress = "https://localhost:44356";
     function LoadCombo(result){
         var $dropdown = $("#cboEmployeeDepartment");
         $.each(result, function (){
             $dropdown.append($("<option />").val(this.DepartmentID).text(this.DepartmentName));
         });
     }
+
+    $('#btnSave').click(function ()
+    {
+        var empname = $('#txtEmployeeName').val().trim();
+        var empemail = $('#txtEmployeeEmail').val().trim();
+        var empDept = $('#cboEmployeeDepartment').val();
+        var gender = $("input[name='EmployeeGender']:checked").val();
+
+        debugger;
+        var oEmployee =
+        {
+            EmployeeName: empname,
+            EmployeeEmail: empemail,
+            DepartmentID: empDept,
+            EmployeeGender: gender
+        }
+
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: _BaseAddress + "/Home/Save",
+            traditional: true,
+            data: JSON.stringify(oEmployee),
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                var oEmp = jQuery.parseJSON(data);
+                if (oEmp.ErrorMessage == "" || oEmp.ErrorMessage == null) {
+                    alert("Data Save Succesfully!!");
+                    window.location.href = _BaseAddress + "/Home/Indexs";
+                }
+                else {
+                    alert(oARS.ErrorMessage);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert(error);
+            }
+        });
+
+    });
 
 </script>

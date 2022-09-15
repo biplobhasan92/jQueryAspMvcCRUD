@@ -3,7 +3,7 @@
 }
 
 
-
+@model Dynamic_App.Models.Employee
 
 <div class="row">
     <div class="col-md-2"></div>
@@ -52,9 +52,9 @@
             </div>
             <div class="col-sm-8">
                 Male :
-                <input type="radio" name="EmployeeGender" id="1" />
+                <input type="radio" name="EmployeeGender" id="EmployeeGender1" value="1"/>
                 Female :
-                <input type="radio" name="EmployeeGender" id="2" />
+                <input type="radio" name="EmployeeGender" id="EmployeeGender2" value="2"/>
             </div>
         </div>
         <br />
@@ -75,13 +75,31 @@
 
 <script>
 
-    debugger;
+
     var listDepts = [];
-    $(document).ready(function (){
+    var _oEmployee = null;
+    $(document).ready(function () {
+        debugger;
         listDepts = @Html.Raw(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(ViewBag.listDepts));
+        _oEmployee = @Html.Raw(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(Model));
         LoadCombo(listDepts);
+        LoadEmp(_oEmployee);
     });
 
+    var _BaseAddress = "https://localhost:44356";
+    function LoadEmp(result)
+    {
+        $('#txtEmployeeName').val(result.EmployeeName);
+        $('#txtEmployeeEmail').val(result.EmployeeEmail);
+        $('#cboEmployeeDepartment').val(result.DepartmentID);
+        if (result.EmployeeGender == 1) {
+            $('#EmployeeGender1').attr('Checked', true);
+            $('#EmployeeGender2').attr('Checked', false);
+        } else {
+            $('#EmployeeGender1').attr('Checked', false);
+            $('#EmployeeGender2').attr('Checked', true);
+        }
+    }
 
     function LoadCombo(result){
         var $dropdown = $("#cboEmployeeDepartment");
@@ -90,4 +108,45 @@
         });
     }
 
+
+
+    $('#btnSave').click(function () {
+        var empname = $('#txtEmployeeName').val().trim();
+        var empemail = $('#txtEmployeeEmail').val().trim();
+        var empDept = $('#cboEmployeeDepartment').val();
+        var gender = $("input[name='EmployeeGender']:checked").val();
+
+        debugger;
+        var oEmployee =
+        {
+            EmployeeID: _oEmployee.EmployeeID,
+            EmployeeName: empname,
+            EmployeeEmail: empemail,
+            DepartmentID: empDept,
+            EmployeeGender: gender
+        }
+
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: _BaseAddress + "/Home/Update",
+            traditional: true,
+            data: JSON.stringify(oEmployee),
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                var oEmp = jQuery.parseJSON(data);
+                if (oEmp.ErrorMessage == "" || oEmp.ErrorMessage == null) {
+                    alert("Data Update Succesfully!!");
+                    window.location.href = _BaseAddress + "/Home/Indexs";
+                }
+                else {
+                    alert(oARS.ErrorMessage);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert(error);
+            }
+        });
+
+    });
 </script>
