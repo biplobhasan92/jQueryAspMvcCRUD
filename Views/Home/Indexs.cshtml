@@ -1,0 +1,51 @@
+﻿@{
+    ViewBag.Title = "About";
+}
+
+<br/>
+<br/>
+<br/>
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <div class="col-md-12">
+            <h3>Employee List</h3>
+            <br />
+            <br />
+            <a href="@Url.Action("Indexs","Home")">Employee List</a>
+            <a href="@Url.Action("Index","Home")">Home</a>
+        </div>
+        <div class="col-md-12">
+            <table class="table table-responsive">
+                <thead>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Dept</th>
+                    <th>Gender</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </thead>
+                <tbody>
+                    @{
+                        foreach (System.Data.DataRow dr in ViewBag.empList.Rows)
+                        {
+                            <tr>
+                                <td>@dr["EmpName"]</td>
+                                <td>@dr["EmpEmail"]</td>
+                                <td>@dr["EmpDept"]</td>
+                                <td>@dr["EmpGender"]</td>
+                                <td><a href="/Home/EditEmp?id=@dr["EmployeeID"]">Edit</a></td>
+                                <td><a href="/Home/Delete?id=@dr["EmployeeID"]" onclick="return confirm('Want to Delete the Record ?')">Delete</a></td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+                </table>
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+    </div>
+
+<script>
+     
+</script>

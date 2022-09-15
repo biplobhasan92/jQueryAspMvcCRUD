@@ -1,0 +1,126 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+        <div class="col-sm-12">
+            <h3>Employee Base Info</h3>
+            <br />
+            <a href="@Url.Action("Indexs","Home")">Employee List</a>
+            <a href="@Url.Action("Index","Home")">Home</a>
+        </div>
+        <div class="col-sm-12">
+            <div class="col-sm-4">
+                <label> Name: </label>
+            </div>
+            <div class="col-sm-4">
+                <input type="text" id="txtEmpName" class="form-control" placeholder="Enter Name" style="width:100%" />
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <div class="col-sm-4">
+                <label> Email: </label>
+            </div>
+            <div class="col-sm-4">
+                <input type="text" id="txtEmpEmail" class="form-control" placeholder="Enter Email" style="width:100%" />
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <div class="col-sm-4">
+                <label> Dept: </label>
+            </div>
+            <div class="col-sm-4">
+                <select id="cboEmpDept" style="width:100%" class="form-control">
+                    <option value="0">- Select -</option>
+                    <option value="1">IIT</option>
+                    <option value="2">MIS</option>
+                    <option value="3">Audit</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <div class="col-sm-4">
+                <label > Gender: </label>
+            </div>
+            <div class="col-sm-4">
+                <input type="radio" name="EmpGender" id="1" value="1"/>
+                <label>Male</label>
+                <input type="radio" name="EmpGender" id="2" value="2" />
+                <label>Female</label>
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <div class="col-sm-4">
+                 
+            </div>
+            <div class="col-sm-4">
+                <input type="button" class="btn btn-danger" id="btnReset" value="Reset"/>
+                <input type="button" class="btn btn-success" id="btnSave" value="Save"/>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3"> </div>
+    </div>
+
+
+
+
+<script>
+    var _BaseAddress = "https://localhost:44327";
+    var _sBackLink = "";
+    $(document).ready(function ()
+    {
+        //sessionStorage.setItem("BackLink", window.location.href);
+        _sBackLink = sessionStorage.getItem("BackLink");
+    });
+
+    $("#btnSave").click(function (){
+
+        debugger;
+        var EmpName = $("#txtEmpName").val();
+        var EmpEmail = $("#txtEmpEmail").val();
+        var EmpDeptID = $("#cboEmpDept").val();
+        var EmpDept = $("#cboEmpDept option:selected").text();
+        var EmpGender = $("input[name='EmpGender']:checked").val();
+        
+
+        // $('select[name=nameOfTheBox] option:selected').text();
+        var oEmployee =
+        {
+            EmpName: EmpName,
+            EmpEmail: EmpEmail,
+            EmpDeptID: EmpDeptID,
+            EmpDept: EmpDept,
+            EmpGender: EmpGender
+        }
+
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: _BaseAddress + "/Home/Save",
+            traditional: true,
+            data: JSON.stringify(oEmployee),
+            contentType: "application/json; charset=utf-8",
+            success: function (data){
+                var oEmp = jQuery.parseJSON(data);
+                if (oEmp.ErrorMessage == "" || oEmp.ErrorMessage == null){
+                    alert("Data Save Succesfully!!");
+                    window.location.href = _BaseAddress + "/Home/Indexs";
+                }
+                else
+                {
+                    alert(oARS.ErrorMessage);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert(error);
+            }
+        });
+    });
+</script>
